@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список данных</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .pagination {
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            margin-right: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        .page-options {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Список данных</h1>
+    <button onclick="window.location.href='https://child-website.com'">Перейти на дочерний сайт</button>
+</div>
+
+<div class="page-options">
+    <label for="data-count">Отобразить:</label>
+    <select id="data-count" onchange="changePageSize()">
+        <option value="20">20</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+        <option value="10">10</option>
+    </select>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Данные</th>
+        </tr>
+    </thead>
+    <tbody id="data-list">
+        <!-- Здесь будут отображаться данные -->
+    </tbody>
+</table>
+
+<div class="pagination">
+    <button onclick="prevPage()">Предыдущая</button>
+    <button onclick="nextPage()">Следующая</button>
+</div>
+
+<script>
+    let dataList = [];  // Массив для хранения данных, полученных через API
+    let currentPage = 1;
+    let pageSize = 20;
+
+    // Функция для получения данных с API
+    function fetchData() {
+        fetch('https://your-api.com/get-data')  // Замените на URL вашего API
+            .then(response => response.json())
+            .then(data => {
+                dataList = data;  // Предполагаем, что API возвращает массив данных
+                displayData();
+            })
+            .catch(error => console.error('Ошибка при получении данных:', error));
+    }
+
+    function displayData() {
+        const dataContainer = document.getElementById('data-list');
+        dataContainer.innerHTML = '';
+
+        const startIndex = (currentPage - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+
+        const currentData = dataList.slice(startIndex, endIndex);
+
+        currentData.forEach(item => {
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.textContent = item;  // Отображаем данные в таблице
+            row.appendChild(cell);
+            dataContainer.appendChild(row);
+        });
+    }
+
+    function nextPage() {
+        const totalPages = Math.ceil(dataList.length / pageSize);
+        if (currentPage < totalPages) {
+            currentPage++;
+            displayData();
+        }
+    }
+
+    function prevPage() {
+        if (currentPage > 1) {
+            currentPage--;
+            displayData();
+        }
+    }
+
+    function changePageSize() {
+        pageSize = parseInt(document.getElementById('data-count').value);
+        currentPage = 1;  // Сбросить на первую страницу
+        displayData();
+    }
+
+    // Инициализация страницы с загрузкой данных с API
+    fetchData();
+</script>
+
+</body>
+</html>
